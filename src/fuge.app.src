@@ -1,0 +1,15 @@
+{application, fuge,
+ [{description, "An Erlang library for refactoring critical paths"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, { fuge_app, []}},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {env,[]},
+  {modules, []},
+  {maintainers, []},
+  {licenses, []},
+  {links, []}
+ ]}.
