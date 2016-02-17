@@ -118,9 +118,7 @@ subscriber_key(Name, SubscriberName) ->
     {Name, SubscriberName}.
 
 subscriber_value(Fuge, {SubscriberName, SubscriberState}) ->
-    NewState = SubscriberName:init(Fuge, SubscriberState),
-    #fuge_subscriber{name = SubscriberName,
-                     state = NewState};
+    SubscriberName:init(Fuge, SubscriberState);
 subscriber_value(Fuge, SubscriberName) ->
     subscriber_value(Fuge, {SubscriberName, undefined}).
 
@@ -128,13 +126,10 @@ get_subscriber(Name, SubscriberName) ->
     case ets:lookup(?STORE, subscriber_key(Name, SubscriberName)) of
         [] ->
             {error, not_found};
-        [{_Key, Subscriber}] ->
-            Subscriber
+        [{_SubscriberName, SubscriberState}] ->
+            SubscriberState
     end.
 
 handle_subscriber(Fuge, SubscriberName, Result) ->
-    % TODO try catch?
-    Subscriber = get_subscriber(Fuge#fuge.name, SubscriberName),
-    SubscriberName:handle_result(Fuge,
-                                 Subscriber#fuge_subscriber.state,
-                                 Result).
+    SubscriberState = get_subscriber(Fuge#fuge.name, SubscriberName),
+    SubscriberName:handle_result(Fuge, SubscriberState, Result).
