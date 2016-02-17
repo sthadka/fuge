@@ -3,7 +3,9 @@
 -include_lib("eunit/include/eunit.hrl").
 
 -export([control/0,
-         candidate/0]).
+         candidate1/0,
+         candidate2/0
+        ]).
 
 fuge_test_() ->
     {setup, fun setup/0, fun teardown/1,
@@ -19,7 +21,8 @@ teardown(_) ->
 
 fuge() ->
     Fuge = fuge:new(test),
-    fuge:run(test, fun ?MODULE:control/0, fun ?MODULE:candidate/0),
+    fuge:run(test, fun ?MODULE:control/0, [fun ?MODULE:candidate1/0,
+                                           fun ?MODULE:candidate2/0]),
     timer:sleep(100).
 
 %%-------------------------------------------------------------------
@@ -33,8 +36,13 @@ control() ->
 
 %% Candidate function calculates sum of all numbers between 1, 1000 using
 %% custom function code
-candidate() ->
+candidate1() ->
     sum(1, 1000).
+
+%% Candidate function calculates sum of all numbers between 1, 1000 using
+%% the formula -> n * (n + 1) / 2
+candidate2() ->
+    1000 * (1000 + 1) div 2.
 
 sum(Start, End) ->
     sum(Start, End, 0).
