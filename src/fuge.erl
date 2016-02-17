@@ -8,7 +8,7 @@
 -include("fuge.hrl").
 
 -export([new/1, new/2, new/3,
-         run/3, run/4]).
+         run/3, run/5, run/4]).
 
 -export_type([fuge/0,
               name/0,
@@ -41,13 +41,17 @@ new(Name, Subscribers, Options) ->
 
 -spec run(name(), fun(), fun()) -> any().
 run(Name, Control, Candidate) ->
-    run(Name, Control, Candidate, []).
+    run(Name, Control, Candidate, undefined, []).
 
--spec run(name(), fun(), fun(), list()) -> any().
-run(Name, Control, Candidate, Options) ->
+-spec run(name(), fun(), fun(), any()) -> any().
+run(Name, Control, Candidate, Context) ->
+    run(Name, Control, Candidate, Context, []).
+
+-spec run(name(), fun(), fun(), any(), list()) -> any().
+run(Name, Control, Candidate, Context, Options) ->
     case fuge_server:get(Name) of
         {ok, Fuge} ->
-            do_run(Fuge, Control, Candidate, Options);
+            do_run(Fuge, Control, Candidate, Context, Options);
         {error, not_found} ->
             Control()
     end.
@@ -56,12 +60,12 @@ run(Name, Control, Candidate, Options) ->
 %% Internal functions
 %%-------------------------------------------------------------------
 
-do_run(Fuge, Control, Candidate, Options) ->
-    % TODO add context
+do_run(Fuge, Control, Candidate, Context, Options) ->
     % TODO random runs
     ControlData = do_run_experiment(Control, Options),
     CandidateData = do_run_experiment(Candidate, Options),
-    Result = #fuge_result{control = ControlData,
+    Result = #fuge_result{context = Context,
+                          control = ControlData,
                           candidate = CandidateData,
                           execution_order = [0, 1]},
     fuge_server:experiment(Fuge, Result),
