@@ -33,22 +33,28 @@ new(Name, Subscribers) ->
 new(Name, Subscribers, Options) ->
     fuge_server:new(Name, Subscribers, Options).
 
--spec run(name(), fun(), list(fun())) -> any().
-run(Name, Control, Candidates) ->
-    run(Name, Control, Candidates, undefined, []).
+-spec run(name(), fun(), fun() | list(fun())) -> any().
+run(Name, Control, Candidates) when is_list(Candidates) ->
+    run(Name, Control, Candidates, undefined, []);
+run(Name, Control, Candidate) ->
+    run(Name, Control, [Candidate], undefined, []).
 
--spec run(name(), fun(), list(fun()), any()) -> any().
-run(Name, Control, Candidates, Context) ->
-    run(Name, Control, Candidates, Context, []).
+-spec run(name(), fun(), fun() | list(fun()), any()) -> any().
+run(Name, Control, Candidates, Context) when is_list(Candidates) ->
+    run(Name, Control, Candidates, Context, []);
+run(Name, Control, Candidate, Context) ->
+    run(Name, Control, [Candidate], Context, []).
 
--spec run(name(), fun(), list(fun()), any(), list()) -> any().
-run(Name, Control, Candidates, Context, Options) ->
+-spec run(name(), fun(), fun() | list(fun()), any(), list()) -> any().
+run(Name, Control, Candidates, Context, Options) when is_list(Candidates) ->
     case fuge_server:get(Name) of
         {ok, Fuge} ->
             do_run(Fuge, Control, Candidates, Context, Options);
         {error, not_found} ->
             Control()
-    end.
+    end;
+run(Name, Control, Candidate, Context, Options) ->
+    run(Name, Control, [Candidate], Context, Options).
 
 %%-------------------------------------------------------------------
 %% Internal functions

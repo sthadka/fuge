@@ -21,6 +21,7 @@ teardown(_) ->
 
 fuge() ->
     Fuge = fuge:new(test),
+    fuge:run(test, fun ?MODULE:control/0, fun ?MODULE:candidate1/0),
     fuge:run(test, fun ?MODULE:control/0, [fun ?MODULE:candidate1/0,
                                            fun ?MODULE:candidate2/0]),
     timer:sleep(100).
