@@ -1,4 +1,6 @@
--module(fuge_sub_logger).
+-module(fuge_subscriber_logger).
+
+-behaviour(fuge_subscriber).
 
 -include("fuge.hrl").
 
