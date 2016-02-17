@@ -1,15 +1,8 @@
--record(fuge_subscriber, {
-          % Name of the subscriber
-          name,
-          % State of the subscriber. e.g. Connection information to third-party
-          state
-         }).
-
 -record(fuge, {
           % Name of the experiment
           name :: string() | binary(),
           % List of middlewares to be run for this experiment
-          subscribers :: [#fuge_subscriber{}],
+          subscribers :: list(fuge_subscriber()),
           % Options for the experiment
           options :: list()    % TODO
          }).
@@ -33,3 +26,10 @@
           % Order of execution
           execution_order :: list()
          }).
+
+-type fuge_subscriber() :: atom().
+-type fuge() :: #fuge{}.
+-type result() :: #fuge_result{}.
+-type subscriber_state() :: any().
+-type name() :: term().
+-type error() :: {error, atom()}.

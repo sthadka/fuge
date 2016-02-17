@@ -17,12 +17,6 @@
               subscriber_state/0
              ]).
 
--type fuge() :: #fuge{}.
--type result() :: #fuge_result{}.
--type subscriber_state() :: any().
--type name() :: term().
--type error() :: {error, atom()}.
-
 -define(DEFAULT_SUBSCRIBERS, [fuge_subscriber_logger]).
 
 -define(DEFAULT_OPTIONS, []).

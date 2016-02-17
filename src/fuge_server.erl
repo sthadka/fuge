@@ -38,11 +38,11 @@
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
--spec new(fuge:name(), list(), list()) -> ok | fuge:error().
+-spec new(name(), list(), list()) -> ok | error().
 new(Name, Subscribers, Options) ->
     gen_server:call(?MODULE, {new, Name, Subscribers, Options}).
 
--spec get(fuge:name()) -> {ok, fuge:fuge()} | fuge:error().
+-spec get(name()) -> {ok, fuge()} | error().
 get(Name) ->
     case ets:lookup(?STORE, Name) of
         [] ->
@@ -51,7 +51,7 @@ get(Name) ->
             {ok, Fuge}
     end.
 
--spec experiment(fuge:fuge(), fuge:result()) -> ok.
+-spec experiment(fuge(), result()) -> ok.
 experiment(Fuge, Result) ->
     gen_server:cast(?MODULE, {result, Fuge, Result}).
 

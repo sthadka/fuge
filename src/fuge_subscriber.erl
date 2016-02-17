@@ -7,11 +7,11 @@
 
 -include("fuge.hrl").
 
--callback init(Fuge :: fuge:fuge(),
-               State :: fuge:subscriber_state()) ->
-    NewState :: fuge:subscriber_state().
+-callback init(Fuge :: fuge(),
+               State :: subscriber_state()) ->
+    NewState :: subscriber_state().
 
--callback handle_result(Fuge :: fuge:fuge(),
-                        State :: fuge:subscriber_state(),
-                        Result :: fuge:result()) ->
+-callback handle_result(Fuge :: fuge(),
+                        State :: subscriber_state(),
+                        Result :: result()) ->
     ok.
