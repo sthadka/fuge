@@ -61,13 +61,21 @@ run(Name, Control, Candidate, Context, Options) ->
 %%-------------------------------------------------------------------
 
 do_run(Fuge, Control, Candidate, Context, Options) ->
-    % TODO random runs
-    ControlData = do_run_experiment(Control, Options),
-    CandidateData = do_run_experiment(Candidate, Options),
+    {ControlData, CandidateData, Order} =
+        case random:uniform(2) of
+            1 ->
+                {do_run_experiment(Control, Options),
+                 do_run_experiment(Candidate, Options),
+                 [0,1]};
+            2 ->
+                {do_run_experiment(Candidate, Options),
+                 do_run_experiment(Control, Options),
+                 [1, 0]}
+        end,
     Result = #fuge_result{context = Context,
                           control = ControlData,
                           candidate = CandidateData,
-                          execution_order = [0, 1]},
+                          execution_order = Order},
     fuge_server:experiment(Fuge, Result),
     ControlData#fuge_data.value.
 
