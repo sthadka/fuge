@@ -103,14 +103,9 @@ code_change(_OldVsn, State, _Extra) ->
 %%-------------------------------------------------------------------
 
 create_fuge(Name, Subscribers, Options) ->
-    Opts = handle_options(Options),
     #fuge{name = Name,
           subscribers = Subscribers,
-          options = Opts}.
-
-% TODO whitelist options, do stuff for specific options
-handle_options(Options) ->
-    Options.
+          options = Options}.
 
 subscriber_key(Name, {SubscriberName, _SubscriberState}) ->
     {Name, SubscriberName};

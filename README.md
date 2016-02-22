@@ -32,6 +32,9 @@ Current set of features supported by fuge:
 * Allows context information for every run. Context information can allow
   debugging the performance difference and it is passed on to the subscribers
   as is.
+* Control the frequency of how often the experiment is run. e.g. run the
+  experiment 42% of the time. This allows us to run the experiment less
+  frequently in cases when the overhead of running multiple versions is large.
 
 ## Warning
 

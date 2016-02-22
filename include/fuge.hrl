@@ -4,7 +4,7 @@
           % List of middlewares to be run for this experiment
           subscribers :: list(fuge_subscriber()),
           % Options for the experiment
-          options :: list()    % TODO
+          options :: options()
          }).
 
 -record(fuge_data, {
@@ -31,4 +31,6 @@
 -type result() :: #fuge_result{}.
 -type subscriber_state() :: any().
 -type name() :: term().
--type error() :: {error, atom()}.
+-type error() :: {error, term()}.
+-type options() :: [{frequency, pos_integer()}].
+-type subscriber() :: atom().

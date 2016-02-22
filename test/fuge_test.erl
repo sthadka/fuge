@@ -10,7 +10,8 @@
 fuge_test_() ->
     {setup, fun setup/0, fun teardown/1,
      [
-      {"Basic test", fun fuge/0}
+      {"Simple run",       fun simple_run/0},
+      {"Frequency option", fun frequency_option/0}
      ]}.
 
 setup() ->
@@ -19,12 +20,38 @@ setup() ->
 teardown(_) ->
     application:stop(fuge).
 
-fuge() ->
-    Fuge = fuge:new(test),
+simple_run() ->
+    ok = fuge:new(simple_run),
     fuge:run(test, fun ?MODULE:control/0, fun ?MODULE:candidate1/0),
     fuge:run(test, fun ?MODULE:control/0, [fun ?MODULE:candidate1/0,
                                            fun ?MODULE:candidate2/0]),
     timer:sleep(100).
+
+frequency_option() ->
+    Subscribers = [],
+    Frequency = 42,
+    Options = [{frequency, Frequency}],
+    ErrorMargin = 0.1,
+    NumRuns = 1000,
+
+    ok = fuge:new(frequency_option, Subscribers, Options),
+
+    ControlTable = ets:new(control, []),
+    ets:insert(ControlTable, {count, 0}),
+    CandidateTable = ets:new(candidate, []),
+    ets:insert(CandidateTable, {count, 0}),
+    Control = fun() -> ets:update_counter(ControlTable, count, 1) end,
+    Candidate = fun() -> ets:update_counter(CandidateTable, count, 1) end,
+
+    lists:foreach(fun (_) ->
+                          fuge:run(frequency_option, Control, Candidate)
+                  end, lists:seq(1, NumRuns)),
+
+    ?assert(((NumRuns * ((Frequency - Frequency * ErrorMargin) / 100)) <
+             ets:lookup_element(CandidateTable, count, 2))),
+
+    ?assert(ets:lookup_element(CandidateTable, count, 2) <
+            (NumRuns * ((Frequency + Frequency * ErrorMargin) / 100))).
 
 %%-------------------------------------------------------------------
 %% Internal functions

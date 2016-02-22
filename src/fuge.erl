@@ -18,20 +18,24 @@
              ]).
 
 -define(DEFAULT_SUBSCRIBERS, [fuge_subscriber_logger]).
-
 -define(DEFAULT_OPTIONS, []).
 
--spec new(name()) -> ok | error().
+-spec new(name()) -> ok | error() | list(error()).
 new(Name) ->
     new(Name, ?DEFAULT_SUBSCRIBERS).
 
--spec new(name(), list()) -> ok | error().
+-spec new(name(), list(subscriber())) -> ok | error() | list(error()).
 new(Name, Subscribers) ->
     new(Name, Subscribers, ?DEFAULT_OPTIONS).
 
--spec new(name(), list(), list()) -> ok | error().
+-spec new(name(), list(subscriber()), options()) -> ok | error() | list(error()).
 new(Name, Subscribers, Options) ->
-    fuge_server:new(Name, Subscribers, Options).
+    case validate_options(Options) of
+        [] ->
+            fuge_server:new(Name, Subscribers, Options);
+        Error ->
+            Error
+    end.
 
 -spec run(name(), fun(), fun() | list(fun())) -> any().
 run(Name, Control, Candidates) when is_list(Candidates) ->
@@ -49,7 +53,7 @@ run(Name, Control, Candidate, Context) ->
 run(Name, Control, Candidates, Context, Options) when is_list(Candidates) ->
     case fuge_server:get(Name) of
         {ok, Fuge} ->
-            do_run(Fuge, Control, Candidates, Context, Options);
+            fuge_run(Fuge, Control, Candidates, Context, Options);
         {error, not_found} ->
             Control()
     end;
@@ -59,6 +63,20 @@ run(Name, Control, Candidate, Context, Options) ->
 %%-------------------------------------------------------------------
 %% Internal functions
 %%-------------------------------------------------------------------
+
+%% Check all the fuge options before the actual run
+fuge_run(Fuge, Control, Candidates, Context, Options) ->
+    case proplists:get_value(frequency, Fuge#fuge.options) of
+        undefined ->
+            do_run(Fuge, Control, Candidates, Context, Options);
+        Value ->
+            case Value >= random:uniform(100) of
+                true ->
+                    do_run(Fuge, Control, Candidates, Context, Options);
+                false ->
+                    Control()
+            end
+    end.
 
 do_run(Fuge, Control, Candidates, Context, Options) ->
     NumberedCandidates = lists:zip(lists:seq(1, length(Candidates)), Candidates),
@@ -84,3 +102,17 @@ do_run_experiment(Fun, _Options) ->
 
 shuffle(List) ->
     [X || {_, X} <- lists:sort([{random:uniform(), E} || E <- List])].
+
+%% Validate all options and return ones that failed
+validate_options(Options) ->
+    [Return || Return <-
+               [validate_option(Option, Value) || {Option, Value} <- Options],
+               Return =/= ok].
+
+validate_option(frequency, Value)
+  when is_integer(Value),
+       Value > 0,
+       Value =< 100 ->
+    ok;
+validate_option(Option, Value) ->
+    {error, {invalid_option, {Option, Value}}}.
