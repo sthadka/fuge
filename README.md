@@ -50,10 +50,10 @@ We try to find the sum of consecutive numbers for illustration.
 
 ```erlang
 % Start fuge application
-1> application:start(fuge).
+1> ok = application:start(fuge).
 ok
 % Create a new fuge
-2> fuge:new(my_fuge).
+2> ok = fuge:new(my_fuge).
 ok
 % Control code
 3> Control = fun () -> lists:sum(lists:seq(1, 1000)) end.
